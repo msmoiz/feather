@@ -83,6 +83,14 @@ TEST_CASE("Cursor movement behaves as expected")
 		REQUIRE(end == 8);
 	}
 
+	SECTION("Cursor should move down to correct position when on empty line")
+	{
+		const std::string text_2{"\n\nHello test\n"};
+		const Cursor start{1};
+		const Cursor end = Navigator::move_down(text_2, start);
+		REQUIRE(end == 2);
+	}
+
 	SECTION("Cursor should move down to correct position when line below is longer")
 	{
 		const Cursor start{2};

@@ -43,7 +43,7 @@ Cursor Navigator::move_down(const std::string& text, Cursor cursor)
 	const auto current_line_start{cursor > 0 ? text.find_last_of(newline_, cursor - 1) + 1 : 0};
 	const auto current_line_pos{cursor - current_line_start};
 
-	const auto next_line_start{text.find_first_of(newline_, current_line_start + 1) + 1};
+	const auto next_line_start{text.find_first_of(newline_, current_line_start) + 1};
 	if (next_line_start == 0) // next line is bottom line
 	{
 		return cursor;
