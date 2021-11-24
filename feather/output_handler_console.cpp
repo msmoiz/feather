@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include <Windows.h>
 
@@ -55,17 +56,17 @@ void OutputHandlerConsole::render(const std::string& text, Cursor cursor)
 	const auto [target_x, target_y] = calculate_absolute_cursor_target_coordinates(text, cursor);	
 	while (target_y < viewport_.y) { --viewport_.y; }
 	while (target_y >= (viewport_.y + viewport_.height - 1)) { ++viewport_.y; }
+	while (target_x < viewport_.x) { --viewport_.x; }
+	while (target_x >= (viewport_.x + viewport_.width - 1)) { ++viewport_.x; }
 
-	const auto text_view_start = viewport_.y - 1 == 0 ? 0 : get_nth_occurrence('\n', text, 0, viewport_.y - 1);
-	const auto text_view_end = get_nth_occurrence('\n', text, 0, viewport_.y + viewport_.height - 2);
-
-	std::cout << text.substr(text_view_start, text_view_end - text_view_start - 1);
+	std::cout << get_text_view(text, cursor, {target_x, target_y});
 
 	set_cursor_coordinates(1, viewport_.height);
 	std::cout << clear_line;
 	std::cout << "Line: " << target_y << ", Position: " << target_x;
-	
-	set_cursor_coordinates(target_x, target_y - viewport_.y + 1);
+
+	const auto [rel_x, rel_y] = std::pair{target_x - viewport_.x + 1, target_y - viewport_.y + 1};
+	set_cursor_coordinates(rel_x, rel_y);
 
 	std::cout << show_cursor;
 }
@@ -96,6 +97,40 @@ std::pair<std::size_t, std::size_t> OutputHandlerConsole::calculate_absolute_cur
 	const auto x = cursor - current_line + 1;
 
 	return {x, y};
+}
+
+std::string OutputHandlerConsole::get_text_view(const std::string& text, Cursor cursor,
+	std::pair<std::size_t, std::size_t> absolute_target_coordinates)
+{
+	const auto first_row_start = viewport_.y - 1 == 0 ? 0 : get_nth_occurrence('\n', text, 0, viewport_.y - 1);
+	const auto last_row_start = get_nth_occurrence('\n', text, 0, viewport_.y + viewport_.height - 2);
+	const std::string row_limited_text = text.substr(first_row_start, last_row_start - first_row_start - 1);
+
+	std::vector<std::string> rows;
+	{
+		std::stringstream ss{row_limited_text};
+		std::string row;
+		while (std::getline(ss, row, '\n'))
+		{
+			rows.push_back(row);
+		}
+	}
+
+	for (std::string& row : rows)
+	{
+		row = viewport_.x - 1 < row.length()
+			? row.substr(viewport_.x - 1, viewport_.width)
+			: "";
+	}
+
+	std::string row_and_column_limited_text;
+	for (const std::string& row: rows)
+	{
+		row_and_column_limited_text.append(row).append("\n");
+	}
+	row_and_column_limited_text.erase(row_and_column_limited_text.end() - 1);
+	
+	return row_and_column_limited_text;
 }
 
 std::size_t OutputHandlerConsole::get_nth_occurrence(char needle, const std::string& haystack, std::size_t pos, std::size_t n)

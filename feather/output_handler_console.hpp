@@ -18,6 +18,7 @@ class OutputHandlerConsole final : public OutputHandler
 
 	void set_cursor_coordinates(std::size_t x, std::size_t y);
 	std::pair<std::size_t, std::size_t> calculate_absolute_cursor_target_coordinates(const std::string& text, Cursor cursor);
+	std::string get_text_view(const std::string& text, Cursor cursor, std::pair<std::size_t, std::size_t> absolute_target_coordinates);
 	std::size_t get_nth_occurrence(char needle, const std::string& haystack, std::size_t pos, std::size_t n);
 
 	struct
