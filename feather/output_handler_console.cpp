@@ -128,7 +128,11 @@ std::string OutputHandlerConsole::get_text_view(const std::string& text, Cursor 
 	{
 		row_and_column_limited_text.append(row).append("\n");
 	}
-	row_and_column_limited_text.erase(row_and_column_limited_text.end() - 1);
+
+	if (row_and_column_limited_text.length() > 0)
+	{
+		row_and_column_limited_text.erase(row_and_column_limited_text.end() - 1);
+	}
 	
 	return row_and_column_limited_text;
 }
