@@ -2,6 +2,8 @@
 
 Feather is a lightweight text editor written in less than 600 lines of code (counted with [cloc](https://github.com/AlDanial/cloc)).
 
+![Screenshot](https://i.imgur.com/u58bqnL.png)
+
 Usage: `feather <filename>`
 
 Keys:
